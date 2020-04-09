@@ -1,4 +1,5 @@
 # soda-container
+Quality control server that aggregates labeled data, and corrects them for any anomalies.
 
 ## Setting Up
 
