@@ -1,0 +1,3 @@
+boto3
+Flask
+git+git://github.com/Lambda-AI-Dev/soda.git
