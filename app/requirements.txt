@@ -1,3 +1,4 @@
 boto3
 Flask
+python-dotenv
 git+git://github.com/Lambda-AI-Dev/soda.git
