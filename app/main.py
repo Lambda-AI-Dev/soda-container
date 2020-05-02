@@ -82,7 +82,7 @@ def get_simple_majority(dataset_id):
     n_classes = len(classes)
     params = {}
     # weight function specification to be continued
-    if "weight_func" in content:
+    if content and "weight_func" in content:
         params["weight_func"] = content["weight_func"]
     smc = SimpleMajorityClassifier(n_classes=n_classes, **params)
     bg = BipartiteGraph().add_edges_t(U, V, E)
