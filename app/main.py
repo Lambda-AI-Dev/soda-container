@@ -1,5 +1,4 @@
-from flask import Flask
-from flask import request
+from flask import Flask, request, jsonify
 
 from dotenv import load_dotenv
 from pathlib import Path
@@ -72,9 +71,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return "Hello World!"
+    return "Test Route"
 
-
+# Test Dataset ID: 4898691044887699
 @app.route("/simple-majority/<dataset_id>/")
 def get_simple_majority(dataset_id):
     U, V, E, classes = get_sparse_input(dataset_id)
@@ -86,9 +85,9 @@ def get_simple_majority(dataset_id):
         params["weight_func"] = content["weight_func"]
     smc = SimpleMajorityClassifier(n_classes=n_classes, **params)
     bg = BipartiteGraph().add_edges_t(U, V, E)
-    return {u: classes[i] for u, i in zip(U, smc.predict_sparse(bg))}
+
+    return jsonify({u: classes[i] for u, i in zip(U, smc.predict_sparse(bg))})
 
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
-
