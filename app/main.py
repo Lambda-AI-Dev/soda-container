@@ -7,8 +7,8 @@ from boto3.dynamodb.conditions import Key, Attr
 import boto3
 import os
 
-from soda.utils.graph import BipartiteGraph
-from soda.crowd.simpleMajorityClassifier import SimpleMajorityClassifier
+from soda.utils import BipartiteGraph
+from soda.crowd import SimpleMajorityClassifier
 
 
 env_path = Path('.') / '.env'
