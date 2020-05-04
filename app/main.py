@@ -85,8 +85,8 @@ def get_simple_majority(dataset_id):
         params["weight_func"] = content["weight_func"]
     smc = SimpleMajorityClassifier(n_classes=n_classes, **params)
     bg = BipartiteGraph().add_edges_t(U, V, E)
-
-    return jsonify({u: classes[i] for u, i in zip(U, smc.predict_sparse(bg))})
+    ret = {u: classes[i] for u, i in zip(U, smc.predict_sparse(bg))}
+    return jsonify(ret)
 
 
 if __name__ == "__main__":
