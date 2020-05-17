@@ -7,7 +7,7 @@ import boto3
 import os
 
 from soda.utils import BipartiteGraph
-from soda.crowd import SimpleMajorityClassifier
+from soda.crowd import SimpleMajorityClassifier, SimpleMajorityLabeler
 
 
 env_path = Path('.') / '.env'
@@ -57,9 +57,27 @@ def encode_classes(E):
     return ret, classes
 
 
-def get_sparse_input(dataset_id):
+def encode_labels(E):
+    if not E:
+        return [], None
+    ret = []
+    classes = list(E[0].keys())
+    n = len(classes)
+    for e in E:
+        prob = [0] * n
+        for i, c in enumerate(classes):
+            if e[c]:
+                prob[i] = 1
+        ret.append(prob)
+    return ret, classes
+
+
+def get_sparse_input(dataset_id, classifier=True):
     U, V, E = get_job_triplets(get_task_ids(dataset_id))
-    E, classes = encode_classes(E)
+    if classifier:
+        E, classes = encode_classes(E)
+    else:
+        E, classes = encode_labels(E)
     return U, V, E, classes
 
 
@@ -73,10 +91,11 @@ app = Flask(__name__)
 def index():
     return "Test Route"
 
+
 # Test Dataset ID: 4898691044887699
-@app.route("/simple-majority/<dataset_id>/")
-def get_simple_majority(dataset_id):
-    U, V, E, classes = get_sparse_input(dataset_id)
+@app.route("/simple-majority-classify/<dataset_id>/")
+def get_simple_majority_classifier(dataset_id):
+    U, V, E, classes = get_sparse_input(dataset_id, classifier=True)
     content = request.json
     n_classes = len(classes)
     params = {}
@@ -86,6 +105,21 @@ def get_simple_majority(dataset_id):
     smc = SimpleMajorityClassifier(n_classes=n_classes, **params)
     bg = BipartiteGraph().add_edges_t(U, V, E)
     ret = {u: classes[i] for u, i in zip(U, smc.predict_sparse(bg))}
+    return jsonify(ret)
+
+
+@app.route("/simple-majority-label/<dataset_id>/")
+def get_simple_majority_labeler(dataset_id):
+    U, V, E, classes = get_sparse_input(dataset_id, classifier=False)
+    content = request.json
+    n_classes = len(classes)
+    params = {}
+    # weight function specification to be continued
+    # if content and "weight_func" in content:
+    #     params["weight_func"] = content["weight_func"]
+    sml = SimpleMajorityLabeler()
+    bg = BipartiteGraph().add_edges_t(U, V, E)
+    ret = {u: classes[i] for u, i in zip(U, sml.predict_sparse(bg))}
     return jsonify(ret)
 
 
